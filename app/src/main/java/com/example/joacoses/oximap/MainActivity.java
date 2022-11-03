@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.joacoses.oximap.databinding.ActivityMainBinding;
-import com.example.joacoses.oximap.databinding.PerfilBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
