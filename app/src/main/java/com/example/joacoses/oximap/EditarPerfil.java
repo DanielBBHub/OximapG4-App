@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -71,9 +72,10 @@ public class EditarPerfil extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent i = new Intent(Intent.ACTION_PICK);
-                        i.setType("image/*");
-                        startActivityForResult(i, 1234);
+                        Intent i = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                        final int ACTIVITY_SELECT_IMAGE = 1234;
+                        startActivityForResult(i, ACTIVITY_SELECT_IMAGE);
                     }
                 }
         );
@@ -87,6 +89,7 @@ public class EditarPerfil extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1234) {
+                Log.d(TAG, "Log que me ha pedido el dani: foto cogida");
                 subirImg(data.getData(), "Imagenes/" + user.getEmail());
             }
         }
@@ -95,18 +98,32 @@ public class EditarPerfil extends AppCompatActivity {
     private void subirImg(Uri archivo, String ref)
     {
         StorageReference ficheroRef = storageRef.child(ref);
+        Log.d(TAG, "Log que me ha pedido el dani: " + ficheroRef);
+        ficheroRef.putFile(archivo);
+        storageRef.child("Imagenes/"+user.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                urlImg=uri.toString();
+                Log.d("urlImagen", urlImg);
+            }
+        });
+        /*
         ficheroRef.putFile(archivo).addOnSuccessListener(
                 new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl();
                         if(downloadUri.isSuccessful())
                         {
                             urlImg = downloadUri.getResult().toString();
+                            Toast.makeText(EditarPerfil.this, urlImg, Toast.LENGTH_LONG).show();
+
                         }
                     }
                 }
-        );
+        );*/
     }
 
     private void cogerImagen(){
@@ -124,7 +141,7 @@ public class EditarPerfil extends AppCompatActivity {
 
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(binding.txtNombreEditar.getText().toString())
-                .setPhotoUri(Uri.parse("https://asturscore.com/wp-content/uploads/2010/09/Avatar.jpg"))
+                .setPhotoUri(Uri.parse(urlImg))
                 .build();
 
         user.updateProfile(profileUpdates)
