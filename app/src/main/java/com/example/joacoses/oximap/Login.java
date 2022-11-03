@@ -24,6 +24,15 @@ public class Login extends AppCompatActivity {
         login();
     }
 
+
+
+    // .................................................................
+    // login() -->
+    // .................................................................
+    //En esta funcion se  crea un Intent nuevo con la actividad "MainActivity"
+    //Posteriormente se inicializa dicha actividad
+    //Si el usuario no existe, obtenemos los datos de los usuarios, como el nombre y el email
+    //Sino, comprobamos los datos con Auth
     private void login() {
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario != null) {
@@ -48,6 +57,11 @@ public class Login extends AppCompatActivity {
     }
 
 
+    // .................................................................
+    //requestCode, resultCode: int, data: Intent -->
+    // onActivityResult() -->
+    // .................................................................
+    //Ejecuta login, y en caso de que no se pueda ejecutar, salta un error con el motivo
     public void onActivityResult(int requestCode, int resultCode,Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {

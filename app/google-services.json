@@ -1,41 +1,33 @@
 {
   "project_info": {
-    "project_number": "397486870046",
-    "project_id": "oximap-755b8",
-    "storage_bucket": "oximap-755b8.appspot.com"
+    "project_number": "905799197481",
+    "project_id": "oximapg4-login",
+    "storage_bucket": "oximapg4-login.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:397486870046:android:b7b6c7959d498f5e19280f",
+        "mobilesdk_app_id": "1:905799197481:android:de482b28383deb9ab90d38",
         "android_client_info": {
           "package_name": "com.example.joacoses.oximap"
         }
       },
       "oauth_client": [
         {
-          "client_id": "397486870046-tdp88e8l7jvn03q2ml9jd4rqbbsd8omv.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.joacoses.oximap",
-            "certificate_hash": "6cfd464dd94137eec02ae38cf56c6a77f562c0c2"
-          }
-        },
-        {
-          "client_id": "397486870046-pdp7s7a4lt9jjh3mpih0vdgo9pmccvsi.apps.googleusercontent.com",
+          "client_id": "905799197481-21vba899uheqt42m4n8trka8f2biasbg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBvmpKpi4EViQNy9E-NdcBhfeeYT_R_FCU"
+          "current_key": "AIzaSyBCiSfYV9DeLVp1NT9b2S_XTTww_j31QXs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "397486870046-pdp7s7a4lt9jjh3mpih0vdgo9pmccvsi.apps.googleusercontent.com",
+              "client_id": "905799197481-21vba899uheqt42m4n8trka8f2biasbg.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

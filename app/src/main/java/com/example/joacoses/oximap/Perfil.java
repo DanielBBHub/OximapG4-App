@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+//Solo se van a explicar los metodos ajenos a android studio
+
 public class Perfil extends AppCompatActivity {
     ImageView fotousuario;
     private FirebaseAuth mAuth;
@@ -60,6 +62,11 @@ public class Perfil extends AppCompatActivity {
     }
 
 
+    // .................................................................
+    // editarPerfil() -->
+    // .................................................................
+    //En esta funcion se  crea un Intent nuevo con la actividad "EditarPerfil"
+    //Posteriormente se inicializa dicha actividad
 
     private void editarPerfil()
     {
@@ -67,6 +74,42 @@ public class Perfil extends AppCompatActivity {
         startActivity(i);
     }
 
+
+
+    // .................................................................
+    // currentUser: Firebase -->
+    // cogerDatosUsuario() -->
+    // .................................................................
+    //En esta funcion cogemos los datos de los usuarios con sus claves (Nombre, Mail,...)
+    //y luego cargamos esos datos con la funcion cargarDatosUsuario()
+    public void cogerDatosUsuario(FirebaseUser currentUser)
+    {
+
+        datosUsuario.put("Nombre", currentUser.getDisplayName());
+        datosUsuario.put("Mail", currentUser.getEmail());
+        datosUsuario.put("Fecha", Long.toString( currentUser.getMetadata().getCreationTimestamp()));
+        try
+        {
+            datosUsuario.put("Foto", currentUser.getPhotoUrl().toString());
+        }
+        catch (NullPointerException e)
+        {
+            /*Toast.makeText(Perfil.this, "Fallo al descargar la información",
+                    Toast.LENGTH_SHORT).show();*/
+        }
+
+        cargarDatosUsuario(datosUsuario);
+    }
+
+
+    // .................................................................
+    // datosUsuarios: Map<String, String> -->
+    // cargarDatosUsuario() -->
+    // .................................................................
+    //En esta funcion se encuentra los textbox e imagen del xml
+    //posteriormente se cargar los datos en dichos campos
+    //parseamos la fecha Long a String
+    //y establecemos un placeholder en caso de que no cargue la foto o no disponga de una
     private void cargarDatosUsuario(Map<String, String> datosUsuario)
     {
         binding.txtNombreUsuario.setText(datosUsuario.get("Nombre"));
@@ -88,27 +131,13 @@ public class Perfil extends AppCompatActivity {
         }
     }
 
-    //Coger datos usuario
-    public void cogerDatosUsuario(FirebaseUser currentUser)
-    {
 
-        datosUsuario.put("Nombre", currentUser.getDisplayName());
-        datosUsuario.put("Mail", currentUser.getEmail());
-        datosUsuario.put("Fecha", Long.toString( currentUser.getMetadata().getCreationTimestamp()));
-        try
-        {
-            datosUsuario.put("Foto", currentUser.getPhotoUrl().toString());
-        }
-        catch (NullPointerException e)
-        {
-            /*Toast.makeText(Perfil.this, "Fallo al descargar la información",
-                    Toast.LENGTH_SHORT).show();*/
-        }
 
-        cargarDatosUsuario(datosUsuario);
-    }
-
-    //cerrarSesion
+    // .................................................................
+    // view: View -->
+    // cargarDatosUsuario() -->
+    // .................................................................
+    //En esta funcion cerramos la sesion del usuario y lo devolvemos al MainActivity
     public void cerrarSesion(View view) {
         AuthUI.getInstance().signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

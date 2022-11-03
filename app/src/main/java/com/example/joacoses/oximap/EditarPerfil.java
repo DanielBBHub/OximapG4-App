@@ -1,4 +1,6 @@
 package com.example.joacoses.oximap;
 
-public class EditarPerfil {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class EditarPerfil extends AppCompatActivity {
 }
