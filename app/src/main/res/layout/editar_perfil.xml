@@ -27,26 +27,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fotoUsuario" />
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="63dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="Email:"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/txtNombreEditar" />
-
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="Nueva Contraseña:"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/divider2" />
-
     <EditText
         android:id="@+id/txtNombreEditar"
         android:layout_width="293dp"
@@ -55,24 +35,6 @@
         android:inputType="text"
         app:layout_constraintStart_toStartOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-    <EditText
-        android:id="@+id/txtMailEditar"
-        android:layout_width="293dp"
-        android:layout_height="41dp"
-        android:ems="10"
-        android:inputType="text"
-        app:layout_constraintStart_toStartOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
-
-    <EditText
-        android:id="@+id/txtContrasenyaEditar"
-        android:layout_width="293dp"
-        android:layout_height="41dp"
-        android:ems="10"
-        android:inputType="text"
-        app:layout_constraintStart_toStartOf="@+id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
     <View
         android:id="@+id/divider"
@@ -83,37 +45,18 @@
         app:layout_constraintStart_toStartOf="@+id/txtNombreEditar"
         app:layout_constraintTop_toBottomOf="@+id/txtNombreEditar" />
 
-    <View
-        android:id="@+id/divider2"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@color/verdeNav"
-        app:layout_constraintEnd_toEndOf="@+id/txtMailEditar"
-        app:layout_constraintStart_toStartOf="@+id/txtMailEditar"
-        app:layout_constraintTop_toBottomOf="@+id/txtMailEditar"
-        tools:layout_editor_absoluteY="395dp" />
-
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@color/verdeNav"
-        app:layout_constraintEnd_toEndOf="@+id/txtContrasenyaEditar"
-        app:layout_constraintStart_toStartOf="@+id/txtContrasenyaEditar"
-        app:layout_constraintTop_toBottomOf="@+id/txtContrasenyaEditar"
-        tools:layout_editor_absoluteY="510dp" />
-
     <Button
         android:id="@+id/btnGuardar"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:background="@drawable/btn_aceptar"
         android:text="Guardar"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/txtContrasenyaEditar"
-        app:layout_constraintStart_toStartOf="@+id/txtContrasenyaEditar"
-        app:layout_constraintTop_toBottomOf="@+id/divider3" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
 
     <ImageButton
         android:id="@+id/btnEditarImagen"
@@ -122,5 +65,15 @@
         android:background="@drawable/editarpng"
         app:layout_constraintBottom_toBottomOf="@+id/fotoUsuario"
         app:layout_constraintEnd_toEndOf="@+id/fotoUsuario" />
+
+    <Button
+        android:id="@+id/btnRecuperarContrasenya"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Recuperar Contraseña"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGuardar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

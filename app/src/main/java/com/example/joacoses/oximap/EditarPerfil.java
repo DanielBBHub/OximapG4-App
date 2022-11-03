@@ -35,7 +35,6 @@ public class EditarPerfil extends AppCompatActivity {
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
 
-
     // Create a storage reference from our app
     StorageReference storageRef = storage.getReference();
     // Create a child reference
@@ -54,6 +53,7 @@ public class EditarPerfil extends AppCompatActivity {
 
 
 
+
         binding.btnGuardar.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,10 +61,11 @@ public class EditarPerfil extends AppCompatActivity {
             }
         });
 
-        binding.btnEditarImagen.setOnClickListener( new View.OnClickListener() {
+
+        binding.btnRecuperarContrasenya.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cogerImagen();
+                recuperarContrasenya();
             }
         });
 
@@ -83,22 +84,29 @@ public class EditarPerfil extends AppCompatActivity {
     }
 
 
+
+
     @Override
-    public void onActivityResult(final int requestCode,
-                                 final int resultCode, final Intent data) {
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1234) {
-                Log.d(TAG, "Log que me ha pedido el dani: foto cogida");
                 subirImg(data.getData(), "Imagenes/" + user.getEmail());
             }
         }
     }
 
+
+    // .................................................................
+    // archivo: uri, ref: str -->
+    // subirImg() -->
+    // .................................................................
+    //En este metodo subimos la imagen de perfil que seleccionamos desde la galeria o camara  al storage de firebase,
+    //mas concretamente en la carpeta "Imagenes". Para que sea unica dicha imagen, al subirla le ponemos como nombre
+    //el correo del usuario, ya que este va a ser unico
     private void subirImg(Uri archivo, String ref)
     {
         StorageReference ficheroRef = storageRef.child(ref);
-        Log.d(TAG, "Log que me ha pedido el dani: " + ficheroRef);
         ficheroRef.putFile(archivo);
         storageRef.child("Imagenes/"+user.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -108,37 +116,36 @@ public class EditarPerfil extends AppCompatActivity {
                 Log.d("urlImagen", urlImg);
             }
         });
-        /*
-        ficheroRef.putFile(archivo).addOnSuccessListener(
-                new OnSuccessListener<UploadTask.TaskSnapshot>() {
+    }
 
+
+    // .................................................................
+    // recuperarContrasenya() -->
+    // .................................................................
+    //Este metodo nos envia un email para recuperar la contraseña
+    public void recuperarContrasenya(){
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String emailAddress = user.getEmail();
+
+        auth.sendPasswordResetEmail(emailAddress)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> downloadUri = taskSnapshot.getStorage().getDownloadUrl();
-                        if(downloadUri.isSuccessful())
-                        {
-                            urlImg = downloadUri.getResult().toString();
-                            Toast.makeText(EditarPerfil.this, urlImg, Toast.LENGTH_LONG).show();
-
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Email enviado.");
                         }
                     }
-                }
-        );*/
+                });
     }
 
-    private void cogerImagen(){
-        // Get the data from an ImageView as bytes
-        binding.fotoUsuario.setDrawingCacheEnabled(true);
-        binding.fotoUsuario.buildDrawingCache();
-        Bitmap bitmap = ((BitmapDrawable) binding.fotoUsuario.getDrawable()).getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-    }
 
+    // .................................................................
+    // updateDatos() -->
+    // .................................................................
+    //Este metodo sirve para actualizar los datos del usuario, el que se encuentrar en su textbox e imageview
+    //posteriormente nos llevará a la actividad MainActivity
     private void updateDatos()
     {
-
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(binding.txtNombreEditar.getText().toString())
                 .setPhotoUri(Uri.parse(urlImg))
