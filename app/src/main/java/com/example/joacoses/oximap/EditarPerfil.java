@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.joacoses.oximap.databinding.EditarPerfilBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,8 +53,10 @@ public class EditarPerfil extends AppCompatActivity {
         setContentView(binding.getRoot() );
 
 
+        //poner imagen el el imageview de editar perfil
+        Glide.with(this).load(user.getPhotoUrl().toString()).into(binding.fotoUsuario);
 
-
+        //guardar datos
         binding.btnGuardar.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,13 +64,27 @@ public class EditarPerfil extends AppCompatActivity {
             }
         });
 
-
+        //recuperar contraseña
         binding.btnRecuperarContrasenya.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 recuperarContrasenya();
             }
         });
+
+
+        //clicks que editan la imagen
+        binding.imgEditarImagen.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                        final int ACTIVITY_SELECT_IMAGE = 1234;
+                        startActivityForResult(i, ACTIVITY_SELECT_IMAGE);
+                    }
+                }
+        );
 
         binding.btnEditarImagen.setOnClickListener(
                 new View.OnClickListener() {
@@ -133,6 +150,7 @@ public class EditarPerfil extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Email enviado.");
+                            Toast.makeText(EditarPerfil.this, "Se ha enviado un correo a: "+user.getEmail(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });

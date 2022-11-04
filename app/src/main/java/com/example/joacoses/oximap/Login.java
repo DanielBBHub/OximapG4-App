@@ -36,8 +36,7 @@ public class Login extends AppCompatActivity {
     private void login() {
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario != null) {
-            Toast.makeText(this, "inicia sesión: " + usuario.getDisplayName() +
-                    " - " + usuario.getEmail(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Has iniciado sesión con: "+ usuario.getEmail(), Toast.LENGTH_LONG).show();
             Intent i = new Intent(this, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                     | Intent.FLAG_ACTIVITY_NEW_TASK
