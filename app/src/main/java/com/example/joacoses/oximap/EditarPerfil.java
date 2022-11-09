@@ -56,6 +56,10 @@ public class EditarPerfil extends AppCompatActivity {
         //poner imagen el el imageview de editar perfil
         Glide.with(this).load(user.getPhotoUrl().toString()).into(binding.fotoUsuario);
 
+        //poner icono de la app en el toolbar
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         //guardar datos
         binding.btnGuardar.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -175,16 +179,11 @@ public class EditarPerfil extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "User profile updated.");
+                            Intent i = new Intent(com.example.joacoses.oximap.EditarPerfil.this,MainActivity.class);
+                            startActivity(i);
                         }
                     }
                 });
-
-        Intent i = new Intent(this,MainActivity.class);
-        startActivity(i);
     }
-
-
-
-
 
 }

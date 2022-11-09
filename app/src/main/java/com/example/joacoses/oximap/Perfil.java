@@ -43,6 +43,12 @@ public class Perfil extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
+
+        //poner icono de la app en el toolbar
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         binding.btnEditar.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {

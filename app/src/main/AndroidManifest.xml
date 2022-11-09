@@ -4,16 +4,8 @@
 
 
     <uses-permission android:name="your.package.name.permission.MAPS_RECEIVE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <application
         android:allowBackup="true"
@@ -21,19 +13,16 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/logoredondo"
         android:label="@string/app_name"
+        android:logo="@drawable/logoredondo"
         android:roundIcon="@drawable/logoredondo"
         android:supportsRtl="true"
         android:theme="@style/temaAplicacion"
-        tools:targetApi="31"
-
-        android:usesCleartextTraffic="true"><!-- Permitir el trafico HTTP -->
+        tools:targetApi="31">
 
 
         <activity
-            android:name=".Login"
-            android:exported="true"
-            >
-
+            android:name=".SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -48,6 +37,7 @@
         <activity android:name=".MainActivity"> </activity>
         <activity android:name=".Perfil"> </activity>
         <activity android:name=".EditarPerfil"> </activity>
+        <activity android:name=".Login"> </activity>
     </application>
 
 </manifest>
