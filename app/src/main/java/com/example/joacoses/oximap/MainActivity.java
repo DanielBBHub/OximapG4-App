@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, String> datosUsuario = new HashMap<>();
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +42,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //poner icono de la app en el toolbar
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         cogerDatosUsuario(currentUser);
         comprobarUsuario(datosUsuario);
+
     }
 
 
