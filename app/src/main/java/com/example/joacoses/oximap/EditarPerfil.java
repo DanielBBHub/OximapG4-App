@@ -54,7 +54,15 @@ public class EditarPerfil extends AppCompatActivity {
 
 
         //poner imagen el el imageview de editar perfil
-        Glide.with(this).load(user.getPhotoUrl().toString()).into(binding.fotoUsuario);
+        try {
+            Glide.with(this).load(user.getPhotoUrl().toString()).into(binding.fotoUsuario);
+        }
+        catch (NullPointerException e)
+        {
+            Toast.makeText(this, "No tienes imagen de perfil",
+                    Toast.LENGTH_SHORT).show();
+        }
+
 
         //poner icono de la app en el toolbar
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
