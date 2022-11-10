@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
         android:background="@android:color/transparent"
-        android:text="Recuperar Contraseña"
+        android:text="Cambiar o Recuperar Contraseña"
         android:textColor="#0764B5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/btnGuardar"
