@@ -36,12 +36,34 @@ public class Login extends AppCompatActivity {
     private void login() {
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario != null) {
-            Toast.makeText(this, "Has iniciado sesión con: "+ usuario.getEmail(), Toast.LENGTH_LONG).show();
-            Intent i = new Intent(this, MainActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    | Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
+            //Toast.makeText(this, "Has iniciado sesión con: "+ usuario.getEmail(), Toast.LENGTH_LONG).show();
+            /*Intent i = new Intent(this, MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);*/
+
+            if(usuario.isEmailVerified())
+            {
+                Toast.makeText(this, "Has iniciado sesión con: "+ usuario.getEmail(), Toast.LENGTH_LONG).show();
+
+                Intent i = new Intent(this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+            }
+            else
+            {
+                usuario.sendEmailVerification();
+                Toast.makeText(this, "Verifica la direccion de correo",
+                        Toast.LENGTH_LONG).show();
+                startActivityForResult(AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setAvailableProviders(Arrays.asList(
+                                        new AuthUI.IdpConfig.EmailBuilder().setAllowNewAccounts(true).build(),
+                                        new AuthUI.IdpConfig.GoogleBuilder().build())).build()
+
+                        //.setIsSmartLockEnabled(false)
+                        , RC_SIGN_IN);
+            }
+
         } else {
             List<AuthUI.IdpConfig> providers = Arrays.asList(
                     new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -53,6 +75,7 @@ public class Login extends AppCompatActivity {
                             .build(),
                     RC_SIGN_IN);
         }
+
     }
 
 
