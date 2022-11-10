@@ -3,17 +3,24 @@ package com.example.joacoses.oximap;
 import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.joacoses.oximap.databinding.EditarPerfilBinding;
@@ -44,6 +51,13 @@ public class EditarPerfil extends AppCompatActivity {
 
     String urlImg;
 
+    //notificaciones
+    private Button boton;
+
+    private int notificationId = 0;
+
+    private String CHANNEL_ID = "4444";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +66,9 @@ public class EditarPerfil extends AppCompatActivity {
         binding = EditarPerfilBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot() );
 
+        //notificaciones
+
+        createNotificationChannel();
 
         //poner imagen el el imageview de editar perfil
         try {
@@ -81,8 +98,27 @@ public class EditarPerfil extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 recuperarContrasenya();
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("http://"+"mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.drawable.logoredondo)
+                        .setContentTitle("Oximap")
+                        .setContentText("Se ha enviado un correo a tu email para cambiar la contraseña")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                notificationManager.notify(notificationId, builder.build());
             }
         });
+
+        //mostrar nombre actual del usuario en el editText
+        binding.txtNombreEditar.setText(user.getDisplayName());
 
 
         //clicks que editan la imagen
@@ -113,8 +149,6 @@ public class EditarPerfil extends AppCompatActivity {
     }
 
 
-
-
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -124,6 +158,26 @@ public class EditarPerfil extends AppCompatActivity {
             }
         }
     }
+
+    //notificaciones
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "name", importance);
+            channel.setDescription("description");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+        else {
+            Toast.makeText(getApplicationContext(),"Se te ha enviado un correo",Toast.LENGTH_LONG);
+        }
+
+    }//clase
+
 
 
     // .................................................................

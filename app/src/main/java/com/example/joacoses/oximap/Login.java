@@ -1,10 +1,18 @@
 package com.example.joacoses.oximap;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -18,9 +26,19 @@ import java.util.List;
 public class Login extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
 
+
+    //notis
+    //notificaciones
+    private Button boton;
+
+    private int notificationId = 0;
+
+    private String CHANNEL_ID = "4444";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createNotificationChannel();
         login();
     }
 
@@ -52,6 +70,26 @@ public class Login extends AppCompatActivity {
             else
             {
                 usuario.sendEmailVerification();
+                //-----------------------------
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("http://"+"mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.drawable.logoredondo)
+                        .setContentTitle("Oximap")
+                        .setContentText("Se ha enviado un correo a tu email para verificar tu usuario")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true);
+
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                notificationManager.notify(notificationId, builder.build());
+                //-----------------------------
+
+
                 Toast.makeText(this, "Verifica la direccion de correo",
                         Toast.LENGTH_LONG).show();
                 startActivityForResult(AuthUI.getInstance()
@@ -104,5 +142,24 @@ public class Login extends AppCompatActivity {
             }
         }
     }
+
+    //notificaciones
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "name", importance);
+            channel.setDescription("description");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+        else {
+            Toast.makeText(getApplicationContext(),"Se te ha enviado un correo",Toast.LENGTH_LONG);
+        }
+
+    }//clase
 
 }
