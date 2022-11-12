@@ -230,10 +230,20 @@ public class EditarPerfil extends AppCompatActivity {
     //posteriormente nos llevará a la actividad MainActivity
     private void updateDatos()
     {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(binding.txtNombreEditar.getText().toString())
-                .setPhotoUri(Uri.parse(urlImg))
-                .build();
+
+        UserProfileChangeRequest profileUpdates;
+        if(urlImg != null)
+        {
+            profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(binding.txtNombreEditar.getText().toString())
+                    .setPhotoUri(Uri.parse(urlImg))
+                    .build();
+        }
+        else{
+            profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(binding.txtNombreEditar.getText().toString())
+                    .build();
+        }
 
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
