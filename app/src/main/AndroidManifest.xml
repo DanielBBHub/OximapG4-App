@@ -46,7 +46,6 @@
         <activity android:name=".Perfil"> </activity>
         <activity android:name=".EditarPerfil"> </activity>
         <activity android:name=".Login"> </activity>
-        <activity android:name=".prueba"> </activity>
     </application>
 
 </manifest>
