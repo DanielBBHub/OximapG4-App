@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.example.joacoses.oximap.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -32,6 +33,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private int major = 0;
     private int minor = 0;
 
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     // --------------------------------------------------------------
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
@@ -124,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-
+/*
     public void boton_enviar_muestra(View quien) {
 
         Log.d("clienterestandroid", "boton_enviar_pulsado");
@@ -140,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Prueba POST /alta
         PeticionarioREST elPeticionario = new PeticionarioREST();
-        elPeticionario.hacerPeticionREST("POST", "http://192.168.1.141:8080/alta", string_json,
+        elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
                 new PeticionarioREST.RespuestaREST() {
                     @Override
                     public void callback(int codigo, String cuerpo) {
@@ -149,7 +154,45 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+
+
     }
+*/
+
+
+    public void boton_enviar_muestra(View quien) {
+
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = curFormater.format(c);
+        Log.d("pulsado", "-----------------------------------------------------");
+        Log.d("pulsado", "boton_enviar_pulsado");
+        Log.d("pulsado", "-----------------------------------------------------");
+        try {
+            datos_muestra.put("id", major);
+            datos_muestra.put("muestra", minor);
+            datos_muestra.put("fecha",formattedDate);
+            datos_muestra.put("usuario",user.getDisplayName());
+            Log.d("pulsado", String.valueOf(datos_muestra));
+            string_json = String.valueOf(datos_muestra);
+        } catch (JSONException e) {
+            Log.d("pulsado",e.toString());
+
+        }
+
+
+        //Prueba POST /alta
+        PeticionarioREST elPeticionario = new PeticionarioREST();
+        elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
+                new PeticionarioREST.RespuestaREST() {
+                    @Override
+                    public void callback(int codigo, String cuerpo) {
+                        Log.d("clienterestandroid", "POST /alta completado");
+                    }
+                }
+        );
+
+    }//boton_enviar_muestra
 
     // --------------------------------------------------------------
     //inicializarBlueTooth()
@@ -339,6 +382,20 @@ public class MainActivity extends AppCompatActivity {
 
     } // buscarTodosLosDispositivosBTLE()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -348,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
 
         //this.buscarEsteDispositivoBTLE( "EPSG-GTI-PROY-3A" );
 
-        this.buscarEsteDispositivoBTLE("Beacon_Carlos");
+        this.buscarEsteDispositivoBTLE("BeaconRuben");
 
     } // ()
 
