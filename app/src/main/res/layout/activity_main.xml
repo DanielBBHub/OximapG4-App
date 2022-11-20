@@ -51,10 +51,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Button"
-        android:onClick="boton_enviar_muestra"
+        android:onClick="enviarMuestra"
         app:layout_constraintBottom_toBottomOf="@+id/btnPerfil"
         app:layout_constraintStart_toEndOf="@+id/btnPerfil"
         app:layout_constraintTop_toTopOf="@+id/btnPerfil" />
-    
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

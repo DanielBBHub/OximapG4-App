@@ -49,7 +49,7 @@ public class Login extends AppCompatActivity {
     // .................................................................
     //En esta funcion se  crea un Intent nuevo con la actividad "MainActivity"
     //Posteriormente se inicializa dicha actividad
-    //Si el usuario no existe, obtenemos los datos de los usuarios, como el nombre y el email
+    //Si el usuario no existe, obtenemos los datos de los usuarios, como el nombre y el email. Ademas deberá verificar el correo
     //Sino, comprobamos los datos con Auth
     private void login() {
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
@@ -70,7 +70,8 @@ public class Login extends AppCompatActivity {
             else
             {
                 usuario.sendEmailVerification();
-                //-----------------------------
+                //-----------------------------------
+                //se muestra una notificacion para que revises tu correo electronico
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://"+"mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"));
@@ -87,6 +88,7 @@ public class Login extends AppCompatActivity {
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                 notificationManager.notify(notificationId, builder.build());
+                //fin de la notificacion
                 //-----------------------------
 
 
@@ -143,7 +145,10 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    //notificaciones
+    // .................................................................
+    // createNotificationChannel() -->
+    // .................................................................
+    //En esta funcion creamos la notificacion que se mostrará en la app
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library

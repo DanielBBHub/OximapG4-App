@@ -1,6 +1,5 @@
 package com.example.joacoses.oximap;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -23,12 +22,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.joacoses.oximap.databinding.ActivityMainBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,35 +31,29 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
-    //Beacon
+    //Firebase
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+    //Beacon
     private TextView elTexto;
     private Button elBotonEnviar;
     private JSONObject datos_muestra = new JSONObject();
     private String string_json;
-
     private int major = 0;
     private int minor = 0;
 
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    // --------------------------------------------------------------
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
-
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
 
-    // --------------------------------------------------------------
     // Instancias de el scanner BLT
     private BluetoothLeScanner elEscanner;
-
     private ScanCallback callbackDelEscaneo = null;
 
     @Override
@@ -86,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+        //vemos si se ponen los datos en datos_muestras
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //datos_muestra.put("muestra", 1238);
@@ -96,23 +87,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //this.elTexto = (TextView) findViewById(R.id.muestra_txt);
-        /*this.elBotonEnviar = (Button) findViewById(R.id.button4);
-        elBotonEnviar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                boton_enviar_muestra(v);
-            }
-        });*/
 
+        //inicializar bluetooth
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
-
         inicializarBlueTooth();
-
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
-        botonBuscarDispositivosBTLEPulsado(binding.getRoot());
+        buscarDispositivosBTLEPulsado(binding.getRoot());
 
 
     }
@@ -129,39 +110,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-/*
-    public void boton_enviar_muestra(View quien) {
-
-        Log.d("clienterestandroid", "boton_enviar_pulsado");
-        try {
-            datos_muestra.put("ID", major);
-            datos_muestra.put("Medicion", minor);
-            Log.d("clienterestandroid", String.valueOf(datos_muestra));
-            string_json = String.valueOf(datos_muestra);
-        } catch (JSONException e) {
-
-        }
 
 
-        //Prueba POST /alta
-        PeticionarioREST elPeticionario = new PeticionarioREST();
-        elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
-                new PeticionarioREST.RespuestaREST() {
-                    @Override
-                    public void callback(int codigo, String cuerpo) {
-                        Log.d("clienterestandroid", "POST /alta completado");
-                    }
-                }
-        );
-
-
-
-    }
-*/
-
-
-    public void boton_enviar_muestra(View quien) {
-
+    // .................................................................
+    // quien: View -->
+    // boton_enviar_muestra() -->
+    // .................................................................
+    //En este metodo asignamos los datos a las variables y las subimos al servidor mediante un post
+    public void enviarMuestra(View quien) {
+        //ponemos los datos
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = curFormater.format(c);
@@ -180,23 +137,30 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-        //Prueba POST /alta
-        PeticionarioREST elPeticionario = new PeticionarioREST();
-        elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
-                new PeticionarioREST.RespuestaREST() {
-                    @Override
-                    public void callback(int codigo, String cuerpo) {
-                        Log.d("clienterestandroid", "POST /alta completado");
+        //hacemos el post
+        if(minor < 400 && minor > 0 ){
+            //Prueba POST /alta
+            PeticionarioREST elPeticionario = new PeticionarioREST();
+            elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
+                    new PeticionarioREST.RespuestaREST() {
+                        @Override
+                        public void callback(int codigo, String cuerpo) {
+                            Log.d("clienterestandroid", "POST /alta completado");
+                        }
                     }
-                }
-        );
+            );
+
+        }
+
 
     }//boton_enviar_muestra
 
-    // --------------------------------------------------------------
-    //inicializarBlueTooth()
-    // --------------------------------------------------------------
+
+    // .................................................................
+    // inicializarBlueTooth() -->
+    // .................................................................
+    //En este metodo iniciamos bluetooth, chequeamos los permisos.
+    //lo mismo para LeScanner
     private void inicializarBlueTooth() {
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): obtenemos adaptador BT ");
@@ -204,13 +168,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitamos adaptador BT ");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             //return;
         }
         bta.enable();
@@ -244,8 +201,10 @@ public class MainActivity extends AppCompatActivity {
         }
     } // inicializarBlueTooth()
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    // .................................................................
+    // detenerBusquedaDispositivosBTLE() -->
+    // .................................................................
+    //Con este metodo podemos detener la busqueda de dispositivos beatle
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void detenerBusquedaDispositivosBTLE() {
 
@@ -261,6 +220,106 @@ public class MainActivity extends AppCompatActivity {
 
     } // detenerBusquedaDispositivosBTLE()
 
+
+    // .................................................................
+    // resultado: ScanResult -->
+    // mostrarInformacionDispositivoBTLE() -->
+    // .................................................................
+    //Con este metodo obtenemos los diferentes datos que emite el micro
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void mostrarInformacionDispositivoBTLE(ScanResult resultado) {
+
+        BluetoothDevice bluetoothDevice = resultado.getDevice();
+        byte[] bytes = resultado.getScanRecord().getBytes();
+        int rssi = resultado.getRssi();
+
+        Log.d(ETIQUETA_LOG, " ****************************************************");
+        Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
+        Log.d(ETIQUETA_LOG, " ****************************************************");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
+        Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
+
+        TramaIBeacon tib = new TramaIBeacon(bytes);
+        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
+        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
+        Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
+                + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
+        major = Utilidades.bytesToInt(tib.getMajor());
+        Log.d(ETIQUETA_LOG, " minor  = " + Utilidades.bytesToHexString(tib.getMinor()) + "( "
+                + Utilidades.bytesToInt(tib.getMinor()) + " ) ");
+        minor = Utilidades.bytesToInt(tib.getMinor());
+
+        Log.d(ETIQUETA_LOG, " txPower  = " + Integer.toHexString(tib.getTxPower()) + " ( " + tib.getTxPower() + " )");
+        Log.d(ETIQUETA_LOG, " ****************************************************");
+
+    } // mostrarInformacionDispositivoBTLE()
+
+
+    // .................................................................
+    // v: View -->
+    // BuscarDispositivosBTLEPulsado() -->
+    // .................................................................
+    //Con este metodo llamamos a buscarTodosLosDispositivosBTLE()
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void buscarDispositivosBTLEPulsado(View v) {
+        Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado");
+        this.buscarTodosLosDispositivosBTLE();
+    } // ()
+
+    // .................................................................
+    // buscarTodosLosDispositivosBTLE() -->
+    // .................................................................
+    //Con este metodo empezamos a escanear los dispositivos beatle y les pasamos el resultado a mostrarInformacionDispositivoBTLE()
+    //Mostramos un log en caso de error
+    //chequeamos permisos
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void buscarTodosLosDispositivosBTLE() {
+
+        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
+        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): instalamos scan callback ");
+
+        this.callbackDelEscaneo = new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult resultado) {
+                super.onScanResult(callbackType, resultado);
+                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
+                mostrarInformacionDispositivoBTLE(resultado);
+            }
+
+            @Override
+            public void onBatchScanResults(List<ScanResult> results) {
+                super.onBatchScanResults(results);
+                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onBatchScanResults() ");
+
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                super.onScanFailed(errorCode);
+                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanFailed() ");
+
+            }
+        };
+
+        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empezamos a escanear ");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        this.elEscanner.startScan(this.callbackDelEscaneo);
+
+    } // buscarTodosLosDispositivosBTLE()
+
+
+
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    //NO LO USAMOS POR EL MOMENTO
+    //--------------------------------------------------------------------------------------------------------------------------
+/*
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     private void buscarEsteDispositivoBTLE(final String dispositivoBuscado) {
@@ -304,101 +363,6 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void mostrarInformacionDispositivoBTLE(ScanResult resultado) {
-
-        BluetoothDevice bluetoothDevice = resultado.getDevice();
-        byte[] bytes = resultado.getScanRecord().getBytes();
-        int rssi = resultado.getRssi();
-
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-
-        }
-        Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
-        Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
-
-        TramaIBeacon tib = new TramaIBeacon(bytes);
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
-                + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
-        major = Utilidades.bytesToInt(tib.getMajor());
-        Log.d(ETIQUETA_LOG, " minor  = " + Utilidades.bytesToHexString(tib.getMinor()) + "( "
-                + Utilidades.bytesToInt(tib.getMinor()) + " ) ");
-        minor = Utilidades.bytesToInt(tib.getMinor());
-
-        Log.d(ETIQUETA_LOG, " txPower  = " + Integer.toHexString(tib.getTxPower()) + " ( " + tib.getTxPower() + " )");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-
-    } // mostrarInformacionDispositivoBTLE()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void botonBuscarDispositivosBTLEPulsado(View v) {
-        Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado");
-        this.buscarTodosLosDispositivosBTLE();
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void buscarTodosLosDispositivosBTLE() {
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): instalamos scan callback ");
-
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            public void onScanResult(int callbackType, ScanResult resultado) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
-                mostrarInformacionDispositivoBTLE(resultado);
-            }
-
-            @Override
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanFailed() ");
-
-            }
-        };
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empezamos a escanear ");
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-
-        }
-        this.elEscanner.startScan(this.callbackDelEscaneo);
-
-    } // buscarTodosLosDispositivosBTLE()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void botonBuscarNuestroDispositivoBTLEPulsado(View v) {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado");
         //this.buscarEsteDispositivoBTLE( Utilidades.stringToUUID( "EPSG-GTI-PROY-3A" ) );
@@ -418,5 +382,5 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
 
-
+*/
 }

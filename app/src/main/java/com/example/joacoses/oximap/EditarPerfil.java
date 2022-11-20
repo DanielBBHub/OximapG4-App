@@ -98,6 +98,8 @@ public class EditarPerfil extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 recuperarContrasenya();
+                //-----------------------------------
+                //se muestra una notificacion para que revises tu correo electronico
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://"+"mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"));
@@ -114,6 +116,9 @@ public class EditarPerfil extends AppCompatActivity {
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                 notificationManager.notify(notificationId, builder.build());
+                //fin notificacion
+                //-----------------------------------
+
             }
         });
 
@@ -159,7 +164,10 @@ public class EditarPerfil extends AppCompatActivity {
         }
     }
 
-    //notificaciones
+    // .................................................................
+    // createNotificationChannel() -->
+    // .................................................................
+    //En esta funcion creamos la notificacion que se mostrará en la app
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library

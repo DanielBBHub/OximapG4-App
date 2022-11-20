@@ -5,11 +5,12 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 
 // -----------------------------------------------------------------------------------
-// @author: Jordi Bataller i Mascarell
+// @author: Oximap
 // -----------------------------------------------------------------------------------
 public class Utilidades {
 
     // -------------------------------------------------------------------------------
+    //convierte String a bytes
     // -------------------------------------------------------------------------------
     public static byte[] stringToBytes ( String texto ) {
         return texto.getBytes();
@@ -17,6 +18,7 @@ public class Utilidades {
     } // ()
 
     // -------------------------------------------------------------------------------
+    //convierte String a UUID
     // -------------------------------------------------------------------------------
     public static UUID stringToUUID( String uuid ) {
         if ( uuid.length() != 16 ) {
@@ -36,18 +38,21 @@ public class Utilidades {
     } // ()
 
     // -------------------------------------------------------------------------------
+    //convierte uuid a String
     // -------------------------------------------------------------------------------
     public static String uuidToString ( UUID uuid ) {
         return bytesToString( dosLongToBytes( uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() ) );
     } // ()
 
     // -------------------------------------------------------------------------------
+    //convierte uuid a HexString
     // -------------------------------------------------------------------------------
     public static String uuidToHexString ( UUID uuid ) {
         return bytesToHexString( dosLongToBytes( uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() ) );
     } // ()
 
     // -------------------------------------------------------------------------------
+    //convierte bytes a String
     // -------------------------------------------------------------------------------
     public static String bytesToString( byte[] bytes ) {
         if (bytes == null ) {
@@ -62,6 +67,7 @@ public class Utilidades {
     }
 
     // -------------------------------------------------------------------------------
+    //convierte dos Long a bytes
     // -------------------------------------------------------------------------------
     public static byte[] dosLongToBytes( long masSignificativos, long menosSignificativos ) {
         ByteBuffer buffer = ByteBuffer.allocate( 2 * Long.BYTES );
@@ -71,12 +77,14 @@ public class Utilidades {
     }
 
     // -------------------------------------------------------------------------------
+    //convierte bytes a int
     // -------------------------------------------------------------------------------
     public static int bytesToInt( byte[] bytes ) {
         return new BigInteger(bytes).intValue();
     }
 
     // -------------------------------------------------------------------------------
+    //conviente bytes a Long
     // -------------------------------------------------------------------------------
     public static long bytesToLong( byte[] bytes ) {
         return new BigInteger(bytes).longValue();
@@ -121,6 +129,7 @@ public class Utilidades {
     } // ()
 
     // -------------------------------------------------------------------------------
+    //convierte bytes a hexString
     // -------------------------------------------------------------------------------
     public static String bytesToHexString( byte[] bytes ) {
 

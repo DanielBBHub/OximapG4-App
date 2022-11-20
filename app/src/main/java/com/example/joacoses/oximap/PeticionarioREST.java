@@ -55,8 +55,15 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         Log.d("clienterestandroid", "constructor()");
     }
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // .................................................................
+    // params: Void -->
+    // onPostExecute() -->
+    // return bool
+    // .................................................................
+    //En este metodo nos conectamos a la url de nuestra web
+    //conectamos con el servidor
+    //leyemos el cuerpo recibido (datos)
+    //nos devuelve si ha sido exitosa la conexion y la recepcion de datos o no
     @Override
     protected Boolean doInBackground(Void... params) {
         Log.d("clienterestandroid", "doInBackground()");
@@ -134,8 +141,11 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         return false; // doInBackground() NO termina bien
     } // ()
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // .................................................................
+    // comoFue: Bool -->
+    // onPostExecute() -->
+    // .................................................................
+    //En este metodo obtenemos el resultado de como ha ido el Post, si ha sido exitoso o no
     protected void onPostExecute(Boolean comoFue) {
         // llamado tras doInBackground()
         Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);
