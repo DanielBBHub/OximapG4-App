@@ -56,7 +56,6 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     }
 
     // .................................................................
-    // params: Void -->
     // onPostExecute() -->
     // return bool
     // .................................................................
