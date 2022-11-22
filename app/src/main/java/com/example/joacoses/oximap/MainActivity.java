@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private int major = 0;
     private int minor = 0;
     private String uuid = "OximapPrueba";
+    private int contadorMuestras = 0;
 
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
@@ -125,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d("pulsado", "boton_enviar_pulsado");
         Log.d("pulsado", "-----------------------------------------------------");
         try {
-            datos_muestra.put("id", major);
-            datos_muestra.put("muestra", minor);
+            datos_muestra.put("id", minor);
+            datos_muestra.put("muestra", major);
             datos_muestra.put("fecha",formattedDate);
             datos_muestra.put("usuario",user.getDisplayName());
             Log.d("pulsado", String.valueOf(datos_muestra));
@@ -137,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //hacemos el post
-        if(uuid.contains("OXIMAPG4_SPRINT1")){
+        if(uuid.contains("OXIMAPG4_SPRINT1") && contadorMuestras != minor){
+            contadorMuestras = minor;
             //Prueba POST /alta
             PeticionarioREST elPeticionario = new PeticionarioREST();
             elPeticionario.hacerPeticionREST("POST", "http://192.168.1.144:8080/alta", string_json,
@@ -292,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
                 mostrarInformacionDispositivoBTLE(resultado);
                 enviarMuestra(binding.getRoot());
+
             }
 
             @Override
