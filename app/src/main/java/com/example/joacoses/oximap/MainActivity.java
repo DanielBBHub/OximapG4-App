@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private String string_json;
     private int major = 0;
     private int minor = 0;
+    private String uuid = "OximapPrueba";
 
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
@@ -94,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
         buscarDispositivosBTLEPulsado(binding.getRoot());
-
-
     }
 
 
@@ -138,10 +137,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //hacemos el post
-        if(minor < 400 && minor > 0 ){
+        if(uuid.contains("OXIMAPG4_SPRINT1")){
             //Prueba POST /alta
             PeticionarioREST elPeticionario = new PeticionarioREST();
-            elPeticionario.hacerPeticionREST("POST", "http://172.20.10.2:8080/alta", string_json,
+            elPeticionario.hacerPeticionREST("POST", "http://192.168.1.144:8080/alta", string_json,
                     new PeticionarioREST.RespuestaREST() {
                         @Override
                         public void callback(int codigo, String cuerpo) {
@@ -150,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
                     }
             );
 
+        }else{
+            Log.d("clienterestandroid", "No ha hecho el post");
+            Log.d("clienterestandroid", uuid);
         }
 
 
@@ -245,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
         TramaIBeacon tib = new TramaIBeacon(bytes);
         Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
         Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
+            uuid = Utilidades.bytesToString(tib.getUUID());
         Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
                 + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
         major = Utilidades.bytesToInt(tib.getMajor());
@@ -273,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
     // buscarTodosLosDispositivosBTLE() -->
     // .................................................................
     //Con este metodo empezamos a escanear los dispositivos beatle y les pasamos el resultado a mostrarInformacionDispositivoBTLE()
+    //llamamos a enviarMuestra() para subirlo a la base de datos mediante un POST
     //Mostramos un log en caso de error
     //chequeamos permisos
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -287,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onScanResult(callbackType, resultado);
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
                 mostrarInformacionDispositivoBTLE(resultado);
+                enviarMuestra(binding.getRoot());
             }
 
             @Override
