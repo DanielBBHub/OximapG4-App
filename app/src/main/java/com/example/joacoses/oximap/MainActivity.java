@@ -40,6 +40,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,6 +83,13 @@ public class MainActivity extends AppCompatActivity {
     //pulsar dos veces para salir de la app
     private static final int INTERVALO = 2000; //2 segundos para salir
     private long tiempoPrimerClick;
+
+    //latitud y longitud
+    //38.947821, -0.178772
+    //final double random = new Random().nextInt(1); // [0, 60] + 20 => [20, 80]
+    private double random;
+    private double latitud;
+    private double longitud;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,10 +223,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d("pulsado", "boton_enviar_pulsado");
         Log.d("pulsado", "-----------------------------------------------------");
         try {
+            random = ThreadLocalRandom.current().nextDouble(0, 1.5);
+            latitud = 38.947821 + random;
+            longitud = -0.178772 + random;
+            //muestra, usuario, fecha, latitud, longitud
             datos_muestra.put("id", minor);
             datos_muestra.put("muestra", major);
             datos_muestra.put("fecha",formattedDate);
             datos_muestra.put("usuario",user.getDisplayName());
+            datos_muestra.put("latitud",latitud);
+            datos_muestra.put("longitud",longitud);
+
             Log.d("pulsado", String.valueOf(datos_muestra));
             string_json = String.valueOf(datos_muestra);
         } catch (JSONException e) {
