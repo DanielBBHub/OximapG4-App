@@ -83,4 +83,7 @@ dependencies {
     //database
     implementation 'com.google.firebase:firebase-database'
 
+    //boton de botones (floating button)
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
+
 }

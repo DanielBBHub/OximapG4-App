@@ -3,9 +3,15 @@ package com.example.joacoses.oximap;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -19,8 +25,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.joacoses.oximap.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -31,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -48,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private int major = 0;
     private int minor = 0;
     private String uuid = "OximapPrueba";
+    private String nombreBeacon = "OximapPrueba";
     private int contadorMuestras = 0;
+    private int muestraPeligrosa = 4;
 
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
@@ -58,6 +69,19 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothLeScanner elEscanner;
     private ScanCallback callbackDelEscaneo = null;
 
+    //notificaciones
+    private int notificationId = 0;
+    private String CHANNEL_ID = "4444";
+
+    //horas
+    private long horaMuestraEnviada = System.currentTimeMillis();
+    private long tiempoMinimoSinDetectarSensor = 10000;
+    private String horaString = "";
+
+    //pulsar dos veces para salir de la app
+    private static final int INTERVALO = 2000; //2 segundos para salir
+    private long tiempoPrimerClick;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +89,22 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot() );
 
-        binding.btnPerfil.setOnClickListener( new View.OnClickListener() {
+        //notificaciones
+        createNotificationChannel();
+
+        //abrir Perfil desde el boton flotante
+        binding.btnfperfil.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Perfil();
+            }
+        });
+
+        //cambiar el valor del minor desde boton flotante
+        binding.btnfacercade.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cambiarValorMajor();
             }
         });
 
@@ -76,6 +112,47 @@ public class MainActivity extends AppCompatActivity {
         //poner icono de la app en el toolbar
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //floating button
+        FloatingActionButton boton = findViewById(R.id.btnfcentral);
+        FloatingActionButton botonMapa = findViewById(R.id.btnfmapa);
+        FloatingActionButton botonPerfil = findViewById(R.id.btnfperfil);
+        FloatingActionButton botonAcercade = findViewById(R.id.btnfacercade);
+        FloatingActionButton botonInfo = findViewById(R.id.btnfinfo);
+
+        boton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(botonMapa.getVisibility() == View.VISIBLE){
+                    botonMapa.setVisibility(View.GONE);
+                    botonMapa.setClickable(false);
+
+                    botonPerfil.setVisibility(View.GONE);
+                    botonPerfil.setClickable(false);
+
+                    botonAcercade.setVisibility(View.GONE);
+                    botonAcercade.setClickable(false);
+
+                    botonInfo.setVisibility(View.GONE);
+                    botonInfo.setClickable(false);
+                }
+                else {
+                    botonMapa.setVisibility(View.VISIBLE);
+                    botonMapa.setClickable(true);
+
+                    botonPerfil.setVisibility(View.VISIBLE);
+                    botonPerfil.setClickable(true);
+
+                    botonAcercade.setVisibility(View.VISIBLE);
+                    botonAcercade.setClickable(true);
+
+                    botonInfo.setVisibility(View.VISIBLE);
+                    botonInfo.setClickable(true);
+                }
+
+            }
+        });
 
 
         //vemos si se ponen los datos en datos_muestras
@@ -96,26 +173,37 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
         buscarDispositivosBTLEPulsado(binding.getRoot());
-    }
+
+    }//onCreate()
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // Perfil() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En esta funcion se  crea un Intent nuevo con la actividad "Perfil"
     //Posteriormente se inicializa dicha actividad
     private void Perfil()
     {
         Intent i = new Intent( this, Perfil.class);
         startActivity(i);
+        finish();
+    }
+
+    // ...................................................................................................................................
+    // Perfil() -->
+    // ...................................................................................................................................
+    //En esta funcion se  crea un Intent nuevo con la actividad "Perfil"
+    //Posteriormente se inicializa dicha actividad
+    private void cambiarValorMajor()
+    {
+        major = 20;
     }
 
 
-
-    // .................................................................
+    // ...................................................................................................................................
     // quien: View -->
     // boton_enviar_muestra() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En este metodo asignamos los datos a las variables y las subimos al servidor mediante un post
     public void enviarMuestra(View quien) {
         //ponemos los datos
@@ -137,32 +225,94 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        //Wifi joan: 172.20.10.2
+        //wifi carlos:192.168.1.144
+        //Wifi casa Joan: 192.168.1.187
         //hacemos el post
-        if(uuid.contains("OXIMAPG4_SPRINT1") && contadorMuestras != minor){
-            contadorMuestras = minor;
-            //Prueba POST /alta
-            PeticionarioREST elPeticionario = new PeticionarioREST();
-            elPeticionario.hacerPeticionREST("POST", "http://192.168.1.144:8080/alta", string_json,
-                    new PeticionarioREST.RespuestaREST() {
-                        @Override
-                        public void callback(int codigo, String cuerpo) {
-                            Log.d("clienterestandroid", "POST /alta completado");
-                        }
-                    }
-            );
+        try {
+            if(nombreBeacon.contains("Oximap") && contadorMuestras != minor){
+                //hora de envio
+                SimpleDateFormat hora = new SimpleDateFormat("HH:mm:ss", Locale.UK);
+                horaString = hora.format(c);
+                Log.d("HoraPrueba",horaString);
 
-        }else{
-            Log.d("clienterestandroid", "No ha hecho el post");
-            Log.d("clienterestandroid", uuid);
+                //comparar horas
+                horaMuestraEnviada = System.currentTimeMillis();
+                Log.d("horaMuestraEnviada",String.valueOf(horaMuestraEnviada));
+
+
+                contadorMuestras = minor;
+                //Prueba POST /alta
+                PeticionarioREST elPeticionario = new PeticionarioREST();
+                elPeticionario.hacerPeticionREST("POST", "http://192.168.1.144:8080/alta", string_json,
+                        new PeticionarioREST.RespuestaREST() {
+                            @Override
+                            public void callback(int codigo, String cuerpo) {
+                                Log.d("clienterestandroid", "POST /alta completado");
+                            }
+                        }
+                );
+
+                if(major >= muestraPeligrosa){
+                    //-----------------------------------
+                    //se muestra una notificacion porque hay una muestra fuera de lo comun
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                            .setSmallIcon(R.drawable.logoredondo)
+                            .setContentTitle("Oximap")
+                            .setContentText("Se ha detectado una muestra peligrosa: " + major)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true);
+
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+                    notificationManager.notify(notificationId, builder.build());
+                    //fin de la notificacion
+                    //-----------------------------
+                }
+
+
+            }else{
+                Log.d("clienterestandroid", "No ha hecho el post");
+                Log.d("clienterestandroid", uuid);
+                Log.d("clienterestandroid", nombreBeacon);
+            }
+        }
+        catch(Exception e) { }
+
+        //5 minutos a milis = 300000
+        if(System.currentTimeMillis()-horaMuestraEnviada > tiempoMinimoSinDetectarSensor){
+            //-----------------------------------
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                    .setSmallIcon(R.drawable.logoredondo)
+                    .setContentTitle("Oximap")
+                    .setContentText("La última muestra se ha enviado a las: " + horaString)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+            notificationManager.notify(notificationId, builder.build());
+            //fin de la notificacion
+            //-----------------------------
         }
 
 
-    }//boton_enviar_muestra
+    }//()
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // inicializarBlueTooth() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En este metodo iniciamos bluetooth, chequeamos los permisos.
     //lo mismo para LeScanner
     private void inicializarBlueTooth() {
@@ -205,9 +355,13 @@ public class MainActivity extends AppCompatActivity {
         }
     } // inicializarBlueTooth()
 
-    // .................................................................
+
+
+
+
+    // ...................................................................................................................................
     // detenerBusquedaDispositivosBTLE() -->
-    // .................................................................
+    // ...................................................................................................................................
     //Con este metodo podemos detener la busqueda de dispositivos beatle
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void detenerBusquedaDispositivosBTLE() {
@@ -225,10 +379,12 @@ public class MainActivity extends AppCompatActivity {
     } // detenerBusquedaDispositivosBTLE()
 
 
-    // .................................................................
+
+
+    // ...................................................................................................................................
     // resultado: ScanResult -->
     // mostrarInformacionDispositivoBTLE() -->
-    // .................................................................
+    // ...................................................................................................................................
     //Con este metodo obtenemos los diferentes datos que emite el micro
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void mostrarInformacionDispositivoBTLE(ScanResult resultado) {
@@ -244,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
+        nombreBeacon = bluetoothDevice.getName();
         Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
 
         TramaIBeacon tib = new TramaIBeacon(bytes);
@@ -263,10 +420,12 @@ public class MainActivity extends AppCompatActivity {
     } // mostrarInformacionDispositivoBTLE()
 
 
-    // .................................................................
+
+
+    // ...................................................................................................................................
     // v: View -->
     // BuscarDispositivosBTLEPulsado() -->
-    // .................................................................
+    // ...................................................................................................................................
     //Con este metodo llamamos a buscarTodosLosDispositivosBTLE()
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void buscarDispositivosBTLEPulsado(View v) {
@@ -274,9 +433,12 @@ public class MainActivity extends AppCompatActivity {
         this.buscarTodosLosDispositivosBTLE();
     } // ()
 
-    // .................................................................
+
+
+
+    // ...................................................................................................................................
     // buscarTodosLosDispositivosBTLE() -->
-    // .................................................................
+    // ...................................................................................................................................
     //Con este metodo empezamos a escanear los dispositivos beatle y les pasamos el resultado a mostrarInformacionDispositivoBTLE()
     //llamamos a enviarMuestra() para subirlo a la base de datos mediante un POST
     //Mostramos un log en caso de error
@@ -324,71 +486,47 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //--------------------------------------------------------------------------------------------------------------------------
-    //NO LO USAMOS POR EL MOMENTO
-    //--------------------------------------------------------------------------------------------------------------------------
-/*
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private void buscarEsteDispositivoBTLE(final String dispositivoBuscado) {
 
-        Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): instalamos scan callback ");
 
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            public void onScanResult(int callbackType, ScanResult resultado) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanResult() ");
-                mostrarInformacionDispositivoBTLE(resultado);
-            }
-
-            @Override
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanFailed() ");
-
-            }
-        };
-
-        ScanFilter sf = new ScanFilter.Builder().setDeviceName(dispositivoBuscado).build();
-
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-
-            //return;
+    // ...................................................................................................................................
+    // createNotificationChannel() -->
+    // ...................................................................................................................................
+    //En esta funcion creamos la notificacion que se mostrará en la app
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "name", importance);
+            channel.setDescription("description");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
-        this.elEscanner.startScan(this.callbackDelEscaneo);
-    } // buscarEsteDispositivoBTLE()
+        else {
+            Toast.makeText(getApplicationContext(),"Se te ha enviado un correo",Toast.LENGTH_LONG);
+        }
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void botonBuscarNuestroDispositivoBTLEPulsado(View v) {
-        Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado");
-        //this.buscarEsteDispositivoBTLE( Utilidades.stringToUUID( "EPSG-GTI-PROY-3A" ) );
-
-        //this.buscarEsteDispositivoBTLE( "EPSG-GTI-PROY-3A" );
-
-        this.buscarEsteDispositivoBTLE("BeaconRuben");
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void botonDetenerBusquedaDispositivosBTLEPulsado(View v) {
-        Log.d(ETIQUETA_LOG, " boton detener busqueda dispositivos BTLE Pulsado");
-        this.detenerBusquedaDispositivosBTLE();
-    } // ()
+    }//clase
 
 
-*/
+
+    // ...................................................................................................................................
+    // onBackPressed() -->
+    // ...................................................................................................................................
+    //En esta funcion se comprobamos el tiempo desde que se pulsa el boton de volver atras del dispositivo
+    //si el tiempo en que se pulsa el segundo click a dicho boton es menor que 2 segundos, se cierra la aplicacion
+    //en caso contrario la app se queda abierta
+    @Override
+    public void onBackPressed(){
+        if (tiempoPrimerClick + INTERVALO > System.currentTimeMillis()){
+            super.onBackPressed();
+            return;
+        }else {
+            Toast.makeText(this, "Vuelve a presionar para salir", Toast.LENGTH_SHORT).show();
+        }
+        tiempoPrimerClick = System.currentTimeMillis();
+    }
+
 }

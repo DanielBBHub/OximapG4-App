@@ -48,8 +48,9 @@ public class EditarPerfil extends AppCompatActivity {
     // Create a child reference
     // imagesRef now points to "images"
     StorageReference imagesRef = storageRef.child("images/"+user.getEmail());
-
+    //imagen
     String urlImg;
+
 
     //notificaciones
     private Button boton;
@@ -261,6 +262,7 @@ public class EditarPerfil extends AppCompatActivity {
                             Log.d(TAG, "User profile updated.");
                             Intent i = new Intent(com.example.joacoses.oximap.EditarPerfil.this,MainActivity.class);
                             startActivity(i);
+                            finish();
                         }
                     }
                 });
