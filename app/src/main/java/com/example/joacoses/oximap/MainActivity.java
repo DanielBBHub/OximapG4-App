@@ -571,18 +571,24 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result->{
         if(result.getContents() != null){
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Titulo: Resultado");
-            //resultado de lo que se escanea
-            resultadoEscaneo = String.valueOf(result.getContents());
-            builder.setMessage(result.getContents());
-            Log.d("ResultadoScan:", resultadoEscaneo);
+            /*
+            //pop-up
+            //AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            //titulo de pop-up
+            //builder.setTitle("Titulo: Resultado");
+            //mensaje del pop-up
+            //builder.setMessage(result.getContents());
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     dialogInterface.dismiss();
                 }
             }).show();
+            */
+
+            //resultado de lo que se escanea
+            resultadoEscaneo = String.valueOf(result.getContents());
+            Log.d("ResultadoScan:", resultadoEscaneo);
 
         }
     });
