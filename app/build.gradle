@@ -86,4 +86,7 @@ dependencies {
     //boton de botones (floating button)
     implementation 'androidx.navigation:navigation-ui:2.3.5'
 
+    //qr
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
 }

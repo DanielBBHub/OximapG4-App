@@ -45,9 +45,7 @@ public class EditarPerfil extends AppCompatActivity {
 
     // Create a storage reference from our app
     StorageReference storageRef = storage.getReference();
-    // Create a child reference
-    // imagesRef now points to "images"
-    StorageReference imagesRef = storageRef.child("images/"+user.getEmail());
+
     //imagen
     String urlImg;
 
@@ -160,7 +158,7 @@ public class EditarPerfil extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1234) {
-                subirImg(data.getData(), "Imagenes/" + user.getEmail());
+                subirImg(data.getData(), "Imagenes/" + user.getUid());
             }
         }
     }
@@ -200,7 +198,7 @@ public class EditarPerfil extends AppCompatActivity {
     {
         StorageReference ficheroRef = storageRef.child(ref);
         ficheroRef.putFile(archivo);
-        storageRef.child("Imagenes/"+user.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageRef.child("Imagenes/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png'

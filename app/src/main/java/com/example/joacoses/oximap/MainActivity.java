@@ -1,6 +1,8 @@
 package com.example.joacoses.oximap;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -8,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,6 +20,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -31,6 +35,8 @@ import com.example.joacoses.oximap.databinding.ActivityMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
     private double latitud;
     private double longitud;
 
+    //scan
+    public String resultadoEscaneo = "PonemosPrueba";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,11 +119,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //cambiar el valor del minor desde boton flotante
+        //abrir QR desde el boton flotante
         binding.btnfacercade.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cambiarValorMajor();
+                scanCode();
             }
         });
 
@@ -197,23 +207,26 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-
+/*
     // ...................................................................................................................................
-    // Perfil() -->
+    // QR() -->
     // ...................................................................................................................................
-    //En esta funcion se  crea un Intent nuevo con la actividad "Perfil"
+    //En esta funcion se  crea un Intent nuevo con la actividad "QR"
     //Posteriormente se inicializa dicha actividad
-    private void cambiarValorMajor()
+    private void QR()
     {
-        major = 20;
+        Intent i = new Intent( this, QR.class);
+        startActivity(i);
+        finish();
     }
-
+*/
 
     // ...................................................................................................................................
     // quien: View -->
     // boton_enviar_muestra() -->
     // ...................................................................................................................................
     //En este metodo asignamos los datos a las variables y las subimos al servidor mediante un post
+    @SuppressLint("LongLogTag")
     public void enviarMuestra(View quien) {
         //ponemos los datos
         Date c = Calendar.getInstance().getTime();
@@ -240,13 +253,14 @@ public class MainActivity extends AppCompatActivity {
             Log.d("pulsado",e.toString());
 
         }
+        Log.d("Este es el resultado del escaneo",resultadoEscaneo);
 
         //Wifi joan: 172.20.10.2
         //wifi carlos:192.168.1.144
         //Wifi casa Joan: 192.168.1.187
         //hacemos el post
         try {
-            if(nombreBeacon.contains("Oximap") && contadorMuestras != minor){
+            if(nombreBeacon.contains(resultadoEscaneo) && contadorMuestras != minor){
                 //hora de envio
                 SimpleDateFormat hora = new SimpleDateFormat("HH:mm:ss", Locale.UK);
                 horaString = hora.format(c);
@@ -260,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 contadorMuestras = minor;
                 //Prueba POST /alta
                 PeticionarioREST elPeticionario = new PeticionarioREST();
-                elPeticionario.hacerPeticionREST("POST", "http://192.168.1.144:8080/alta", string_json,
+                elPeticionario.hacerPeticionREST("POST", "http://192.168.1.187:8080/alta", string_json,
                         new PeticionarioREST.RespuestaREST() {
                             @Override
                             public void callback(int codigo, String cuerpo) {
@@ -280,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                             .setSmallIcon(R.drawable.logoredondo)
                             .setContentTitle("Oximap")
-                            .setContentText("Se ha detectado una muestra peligrosa: " + major)
+                            .setContentText("Se ha detectado una muestra peligrosa")
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true);
@@ -544,5 +558,33 @@ public class MainActivity extends AppCompatActivity {
         }
         tiempoPrimerClick = System.currentTimeMillis();
     }
+
+    //SCAN
+    private void scanCode(){
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Sube el volumen para activar el flash");
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barLauncher.launch(options);
+    }
+
+    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result->{
+        if(result.getContents() != null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Titulo: Resultado");
+            //resultado de lo que se escanea
+            resultadoEscaneo = String.valueOf(result.getContents());
+            builder.setMessage(result.getContents());
+            Log.d("ResultadoScan:", resultadoEscaneo);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
+
+        }
+    });
 
 }

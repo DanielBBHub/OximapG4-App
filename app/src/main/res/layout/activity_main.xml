@@ -54,7 +54,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/btnfcentral"
         app:layout_constraintEnd_toStartOf="@+id/btnfacercade"
-        app:srcCompat="@drawable/smoke" />
+        app:srcCompat="@drawable/molecule" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnfacercade"
@@ -66,7 +66,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnfcentral"
         app:layout_constraintTop_toTopOf="@+id/btnfcentral"
-        app:srcCompat="@android:drawable/ic_dialog_info" />
+        app:srcCompat="@drawable/qr"/>
 
     <ImageView
         android:id="@+id/imageView"
