@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+    <!-- permiso para el trafico y asi conectarlo a nuestro servidor, lo activamos ("True") y le damos certificado de sistema ("system")-->

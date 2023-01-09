@@ -45,11 +45,17 @@ public class EditarPerfil extends AppCompatActivity {
 
     // Create a storage reference from our app
     StorageReference storageRef = storage.getReference();
-    // Create a child reference
-    // imagesRef now points to "images"
-    StorageReference imagesRef = storageRef.child("images/"+user.getEmail());
 
+    //imagen
     String urlImg;
+
+    //notificaciones
+    private Button boton;
+
+    private int notificationId = 0;
+
+    private String CHANNEL_ID = "4444";
+
 
     //notificaciones
     private Button boton;
@@ -98,6 +104,11 @@ public class EditarPerfil extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 recuperarContrasenya();
+<<<<<<< HEAD
+=======
+                //-----------------------------------
+                //se muestra una notificacion para que revises tu correo electronico
+>>>>>>> Develop
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://"+"mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"));
@@ -114,6 +125,12 @@ public class EditarPerfil extends AppCompatActivity {
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
                 notificationManager.notify(notificationId, builder.build());
+<<<<<<< HEAD
+=======
+                //fin notificacion
+                //-----------------------------------
+
+>>>>>>> Develop
             }
         });
 
@@ -154,12 +171,19 @@ public class EditarPerfil extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1234) {
-                subirImg(data.getData(), "Imagenes/" + user.getEmail());
+                subirImg(data.getData(), "Imagenes/" + user.getUid());
             }
         }
     }
 
+<<<<<<< HEAD
     //notificaciones
+=======
+    // .................................................................
+    // createNotificationChannel() -->
+    // .................................................................
+    //En esta funcion creamos la notificacion que se mostrará en la app
+>>>>>>> Develop
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -191,7 +215,7 @@ public class EditarPerfil extends AppCompatActivity {
     {
         StorageReference ficheroRef = storageRef.child(ref);
         ficheroRef.putFile(archivo);
-        storageRef.child("Imagenes/"+user.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageRef.child("Imagenes/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png'
@@ -230,10 +254,20 @@ public class EditarPerfil extends AppCompatActivity {
     //posteriormente nos llevará a la actividad MainActivity
     private void updateDatos()
     {
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(binding.txtNombreEditar.getText().toString())
-                .setPhotoUri(Uri.parse(urlImg))
-                .build();
+
+        UserProfileChangeRequest profileUpdates;
+        if(urlImg != null)
+        {
+            profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(binding.txtNombreEditar.getText().toString())
+                    .setPhotoUri(Uri.parse(urlImg))
+                    .build();
+        }
+        else{
+            profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(binding.txtNombreEditar.getText().toString())
+                    .build();
+        }
 
         user.updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -243,6 +277,10 @@ public class EditarPerfil extends AppCompatActivity {
                             Log.d(TAG, "User profile updated.");
                             Intent i = new Intent(com.example.joacoses.oximap.EditarPerfil.this,MainActivity.class);
                             startActivity(i);
+<<<<<<< HEAD
+=======
+                            finish();
+>>>>>>> Develop
                         }
                     }
                 });

@@ -18,6 +18,7 @@ import com.example.joacoses.oximap.databinding.PerfilBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -36,6 +37,11 @@ public class Perfil extends AppCompatActivity {
     private Map<String, String> datosUsuario = new HashMap<>();
     private PerfilBinding binding;
 
+
+    //pulsar dos veces para salir de la app
+    private static final int INTERVALO = 2000; //2 segundos para salir
+    private long tiempoPrimerClick;
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = PerfilBinding.inflate(getLayoutInflater());
@@ -48,6 +54,81 @@ public class Perfil extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+<<<<<<< HEAD
+=======
+        //floating button
+        FloatingActionButton boton = findViewById(R.id.btnfcentral);
+        FloatingActionButton botonMapa = findViewById(R.id.btnfmapa);
+        FloatingActionButton botonPerfil = findViewById(R.id.btnfperfil);
+        FloatingActionButton botonAcercade = findViewById(R.id.btnfacercade);
+        FloatingActionButton botonInfo = findViewById(R.id.btnfinfo);
+
+        boton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(botonMapa.getVisibility() == View.VISIBLE){
+                    botonMapa.setVisibility(View.GONE);
+                    botonMapa.setClickable(false);
+
+                    botonPerfil.setVisibility(View.GONE);
+                    botonPerfil.setClickable(false);
+
+                    botonAcercade.setVisibility(View.GONE);
+                    botonAcercade.setClickable(false);
+
+                    botonInfo.setVisibility(View.GONE);
+                    botonInfo.setClickable(false);
+                }
+                else {
+                    botonMapa.setVisibility(View.VISIBLE);
+                    botonMapa.setClickable(true);
+
+                    botonPerfil.setVisibility(View.VISIBLE);
+                    botonPerfil.setClickable(true);
+
+                    botonAcercade.setVisibility(View.VISIBLE);
+                    botonAcercade.setClickable(true);
+
+                    botonInfo.setVisibility(View.VISIBLE);
+                    botonInfo.setClickable(true);
+                }
+
+            }
+        });
+
+        //onClick
+
+        botonMapa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(Perfil.this,MainActivity.class));
+                finish();
+
+            }
+        });
+
+/*
+        botonAcercade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(Perfil.this,AcercaDe.class));
+
+            }
+        });
+
+        botonInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(Perfil.this,Informacion.class));
+
+            }
+        });
+*/
+>>>>>>> Develop
 
         binding.btnEditar.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -65,12 +146,13 @@ public class Perfil extends AppCompatActivity {
 
         cogerDatosUsuario(currentUser);
 
+
     }
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // editarPerfil() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En esta funcion se  crea un Intent nuevo con la actividad "EditarPerfil"
     //Posteriormente se inicializa dicha actividad
 
@@ -82,10 +164,10 @@ public class Perfil extends AppCompatActivity {
 
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // currentUser: Firebase -->
     // cogerDatosUsuario() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En esta funcion cogemos los datos de los usuarios con sus claves (Nombre, Mail,...)
     //y luego cargamos esos datos con la funcion cargarDatosUsuario()
     public void cogerDatosUsuario(FirebaseUser currentUser)
@@ -108,10 +190,10 @@ public class Perfil extends AppCompatActivity {
     }
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // datosUsuarios: Map<String, String> -->
     // cargarDatosUsuario() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En esta funcion se encuentra los textbox e imagen del xml
     //posteriormente se cargar los datos en dichos campos
     //parseamos la fecha Long a String
@@ -139,10 +221,10 @@ public class Perfil extends AppCompatActivity {
 
 
 
-    // .................................................................
+    // ...................................................................................................................................
     // view: View -->
     // cargarDatosUsuario() -->
-    // .................................................................
+    // ...................................................................................................................................
     //En esta funcion cerramos la sesion del usuario y lo devolvemos al MainActivity
     public void cerrarSesion(View view) {
         AuthUI.getInstance().signOut(this)
@@ -154,5 +236,24 @@ public class Perfil extends AppCompatActivity {
                         Perfil.this.finish();
                     }
                 });
+    }
+
+
+
+    // ...................................................................................................................................
+    // onBackPressed() -->
+    // ...................................................................................................................................
+    //En esta funcion se comprobamos el tiempo desde que se pulsa el boton de volver atras del dispositivo
+    //si el tiempo en que se pulsa el segundo click a dicho boton es menor que 2 segundos, se cierra la aplicacion
+    //en caso contrario la app se queda abierta
+    @Override
+    public void onBackPressed(){
+        if (tiempoPrimerClick + INTERVALO > System.currentTimeMillis()){
+            super.onBackPressed();
+            return;
+        }else {
+            Toast.makeText(this, "Vuelve a presionar para salir", Toast.LENGTH_SHORT).show();
+        }
+        tiempoPrimerClick = System.currentTimeMillis();
     }
 }

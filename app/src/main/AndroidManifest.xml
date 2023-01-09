@@ -3,8 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="your.package.name.permission.MAPS_RECEIVE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+<<<<<<< HEAD
+=======
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
+    <uses-permission android:name="android.permission.CAMERA" />
+>>>>>>> Develop
 
 
     <application
@@ -17,12 +30,23 @@
         android:roundIcon="@drawable/logoredondo"
         android:supportsRtl="true"
         android:theme="@style/temaAplicacion"
+<<<<<<< HEAD
         tools:targetApi="31">
+=======
+        tools:targetApi="31"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
+>>>>>>> Develop
 
 
         <activity
             android:name=".SplashActivity"
+<<<<<<< HEAD
             android:exported="true">
+=======
+            android:exported="true"
+            android:networkSecurityConfig="@xml/network_security_config">
+>>>>>>> Develop
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,10 +58,16 @@
                 android:value="" />
         </activity>
 
-        <activity android:name=".MainActivity"> </activity>
+        <activity android:name=".MainActivity"
+            android:networkSecurityConfig="@xml/network_security_config"> </activity>
         <activity android:name=".Perfil"> </activity>
         <activity android:name=".EditarPerfil"> </activity>
         <activity android:name=".Login"> </activity>
+<<<<<<< HEAD
+=======
+        <activity android:name=".QR"> </activity>
+        <activity android:name=".CaptureAct"> </activity>
+>>>>>>> Develop
     </application>
 
 </manifest>
