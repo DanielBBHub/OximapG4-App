@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:visibility="invisible"
-        android:backgroundTint="@color/grey"
         app:layout_constraintBottom_toTopOf="@+id/btnfcentral"
         app:layout_constraintEnd_toStartOf="@+id/btnfcentral"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +51,7 @@
         android:layout_marginBottom="32dp"
         android:clickable="false"
         android:visibility="invisible"
+        android:backgroundTint="@color/grey"
         app:layout_constraintBottom_toTopOf="@+id/btnfcentral"
         app:layout_constraintEnd_toStartOf="@+id/btnfacercade"
         app:srcCompat="@drawable/molecule" />
@@ -66,16 +66,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnfcentral"
         app:layout_constraintTop_toTopOf="@+id/btnfcentral"
-        app:srcCompat="@drawable/qr"/>
+        app:srcCompat="@drawable/qr" />
 
     <WebView
         android:id="@+id/webViewGrafico"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="192dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

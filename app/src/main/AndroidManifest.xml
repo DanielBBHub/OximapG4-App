@@ -53,7 +53,7 @@
         <activity android:name=".Perfil"> </activity>
         <activity android:name=".EditarPerfil"> </activity>
         <activity android:name=".Login"> </activity>
-        <activity android:name=".QR"> </activity>
+        <activity android:name=".Grafico"> </activity>
         <activity android:name=".CaptureAct"> </activity>
     </application>
 

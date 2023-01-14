@@ -10,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -26,7 +27,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +42,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private String uuid = "OximapPrueba";
     private String nombreBeacon = "OximapPrueba";
     private int contadorMuestras = 0;
-    private int muestraPeligrosa = 4;
+    private int muestraPeligrosa = 60;//es 0,06 ppm
 
     // Variables para el codigo de BLT
     private static final String ETIQUETA_LOG = ">>>>";
@@ -100,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
     //scan
     public String resultadoEscaneo = "PonemosPrueba";
 
+    //mapa
+    private WebView myWebView;
+    private WebSettings myWebSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +128,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //abrir Grafico desde el boton flotante
+        binding.btnfinfo.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirGrafico();
+            }
+        });
+
         //abrir QR desde el boton flotante
         binding.btnfacercade.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -132,12 +149,24 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logoredondo48);// set drawable icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //mapa
+        myWebView = binding.webViewGrafico;
+        myWebSettings = myWebView.getSettings();
+        myWebSettings.setJavaScriptEnabled(true);
+
+        myWebSettings.setDomStorageEnabled(true);
+        myWebView.loadUrl("file:///android_asset/mapa.html");
+        Log.d("MapaFallo1", " no va el mapa ");
+        myWebView.setWebViewClient(new WebViewClient());
+
+
         //floating button
         FloatingActionButton boton = findViewById(R.id.btnfcentral);
         FloatingActionButton botonMapa = findViewById(R.id.btnfmapa);
         FloatingActionButton botonPerfil = findViewById(R.id.btnfperfil);
         FloatingActionButton botonAcercade = findViewById(R.id.btnfacercade);
         FloatingActionButton botonInfo = findViewById(R.id.btnfinfo);
+
 
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,19 +236,19 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-/*
+
     // ...................................................................................................................................
-    // QR() -->
+    // Grafico() -->
     // ...................................................................................................................................
-    //En esta funcion se  crea un Intent nuevo con la actividad "QR"
+    //En esta funcion se  crea un Intent nuevo con la actividad "Grafico"
     //Posteriormente se inicializa dicha actividad
-    private void QR()
+    private void abrirGrafico()
     {
-        Intent i = new Intent( this, QR.class);
+        Intent i = new Intent( this, Grafico.class);
         startActivity(i);
         finish();
     }
-*/
+
 
     // ...................................................................................................................................
     // quien: View -->

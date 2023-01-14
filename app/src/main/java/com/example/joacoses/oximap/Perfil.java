@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +23,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,7 +35,7 @@ import java.util.Map;
 //Solo se van a explicar los metodos ajenos a android studio
 
 public class Perfil extends AppCompatActivity {
-    ImageView fotousuario;
+
     private FirebaseAuth mAuth;
     FirebaseUser currentUser;
     private Map<String, String> datosUsuario = new HashMap<>();
@@ -41,6 +45,9 @@ public class Perfil extends AppCompatActivity {
     //pulsar dos veces para salir de la app
     private static final int INTERVALO = 2000; //2 segundos para salir
     private long tiempoPrimerClick;
+
+    //scan
+    public String resultadoEscaneo = "PonemosPrueba";
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,36 +103,26 @@ public class Perfil extends AppCompatActivity {
         });
 
         //onClick
-
-        botonMapa.setOnClickListener(new View.OnClickListener() {
+        binding.btnfmapa.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
-                startActivity(new Intent(Perfil.this,MainActivity.class));
-                finish();
-
+            public void onClick(View v) {
+                MainActivity();
             }
         });
 
-/*
-        botonAcercade.setOnClickListener(new View.OnClickListener() {
+        binding.btnfinfo.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
-                startActivity(new Intent(Perfil.this,AcercaDe.class));
-
+            public void onClick(View v) {
+                abrirGrafico();
             }
         });
 
-        botonInfo.setOnClickListener(new View.OnClickListener() {
+        binding.btnfacercade.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
-                startActivity(new Intent(Perfil.this,Informacion.class));
-
+            public void onClick(View v) {
+                scanCode();
             }
         });
-*/
 
         binding.btnEditar.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -143,7 +140,6 @@ public class Perfil extends AppCompatActivity {
 
         cogerDatosUsuario(currentUser);
 
-
     }
 
 
@@ -156,6 +152,29 @@ public class Perfil extends AppCompatActivity {
     private void editarPerfil()
     {
         Intent i = new Intent( this, EditarPerfil.class);
+        startActivity(i);
+    }
+
+    // ...................................................................................................................................
+    // Grafico() -->
+    // ...................................................................................................................................
+    //En esta funcion se  crea un Intent nuevo con la actividad "Grafico"
+    //Posteriormente se inicializa dicha actividad
+    private void abrirGrafico()
+    {
+        Intent i = new Intent( this, Grafico.class);
+        startActivity(i);
+        finish();
+    }
+
+    // ...................................................................................................................................
+    // MainActivity() -->
+    // ...................................................................................................................................
+    //En esta funcion se  crea un Intent nuevo con la actividad "MainActivity"
+    //Posteriormente se inicializa dicha actividad
+    private void MainActivity()
+    {
+        Intent i = new Intent( this, MainActivity.class);
         startActivity(i);
     }
 
@@ -253,4 +272,39 @@ public class Perfil extends AppCompatActivity {
         }
         tiempoPrimerClick = System.currentTimeMillis();
     }
+
+    //SCAN
+    private void scanCode(){
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Sube el volumen para activar el flash");
+        options.setBeepEnabled(true);
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barLauncher.launch(options);
+    }
+
+    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result-> {
+        if (result.getContents() != null) {
+            /*
+            //pop-up
+            //AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            //titulo de pop-up
+            //builder.setTitle("Titulo: Resultado");
+            //mensaje del pop-up
+            //builder.setMessage(result.getContents());
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
+            */
+
+            //resultado de lo que se escanea
+            resultadoEscaneo = String.valueOf(result.getContents());
+            Log.d("ResultadoScan:", resultadoEscaneo);
+
+
+        }
+    });
 }
